@@ -1,8 +1,8 @@
 library(epiR)
 
 # Fixed inputs
-total_n <- 350000 # total sample size
-ratio_m <- 6.81   # ratio of unexposed to exposed
+total_n <- 350000 # total sample size need to change for our study
+ratio_m <- 6.81   # ratio of unexposed to exposed need to change for our study 
 
 # P0 values from 5% to 50%
 p0_range <- c(0.05, 0.15, 0.25, 0.41, 0.50)
