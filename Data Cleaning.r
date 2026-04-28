@@ -11,13 +11,12 @@ library(epiR)
 library(table1)
 library(here) 
 
-<<<<<<< HEAD
 #Open working directory 
 data_dir <- "/Users/anshupoudel/EPI-514-Project"
 
 #Download dataset
 #brfss_21_clean <- read.csv(file.path(data_dir, "brfss_21_clean.csv"))
-=======
+
 # Open dataset ------------------------------------------------------------
 brfss_24 <- read_xpt(here("LLCP2024.XPT "))
 
@@ -32,4 +31,4 @@ table(study_data$`_STATE`)
 # Tooth loss variable count for power calculation ------------------------------------------------------------
 table(study_data$`RMVTETH4`, useNA = "ifany")
                           
->>>>>>> a66cd0ddbb54185190b7178bf9329358fad57889
+
