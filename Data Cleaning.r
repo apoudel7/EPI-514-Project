@@ -12,7 +12,7 @@ library(table1)
 library(here) 
 
 #Open working directory 
-data_dir <- "~/EPI-514-Project" #updated to home directory of every user with ~
+#data_dir <- "~/EPI-514-Project" #updated to home directory of every user with ~
 
 #Download dataset
 #brfss_21_clean <- read.csv(file.path(data_dir, "brfss_21_clean.csv"))
