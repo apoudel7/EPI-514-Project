@@ -8,7 +8,6 @@ library(tidyverse)
 
 #filter data to select states
 
-
 # Fixed inputs
 n_total <- 201540 # total sample size need to change for our study
 n_unexposed <-  159988
