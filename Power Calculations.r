@@ -10,23 +10,28 @@ library(tidyverse)
 
 
 # Fixed inputs
-total_n <- 350000 # total sample size need to change for our study
-ratio_m <- 6.81   # ratio of unexposed to exposed need to change for our study 
+n_total <- 201540 # total sample size need to change for our study
+n_unexposed <-  159988
+n_exposed <- 41552
+ratio_m <- n_unexposed / n_exposed # ratio of unexposed to exposed need to change for our study 
 
-# P0 values from 5% to 50%
-p0_range <- c(0.05, 0.15, 0.25, 0.41, 0.50)
+# P0 values range from calculation of prevalence of outcome from dataset 
+p0_range <- c(0.40, 0.43, 0.46, 0.49, 0.52)
 
-# Function to calculate MDOR for each P0
-calculate_mdor <- function(p0_val) {
+# Function to calculate MDPR for each P0
+calculate_mdpr <- function(p0_val) {
   result <- epi.sscc(
-    OR = NA,              
-    p0 = p0_val,          
-    n = total_n,          
-    power = 0.80,         
-    r = ratio_m,          
+    OR = NA,
+    p0 = p0_val,
+    n = n_total,
+    power = 0.80,
+    r = ratio_m,
     method = "unmatched"
   )
-  return(result$OR)
+  mdor <- result$OR
+  # Convert OR -> PR
+  mdpr <- mdor / ((1 - p0_val) + (p0_val * mdor))
+  return(mdpr)
 }
 
 # Generate the results
