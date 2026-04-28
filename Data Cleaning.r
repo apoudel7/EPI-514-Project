@@ -18,7 +18,10 @@ library(here)
 #brfss_21_clean <- read.csv(file.path(data_dir, "brfss_21_clean.csv"))
 
 # Open dataset ------------------------------------------------------------
-brfss_24 <- read_xpt(here("LLCP2024.XPT "))
+brfss_24 <- read_xpt(here("LLCP2024.XPT"))
+
+#to remove the annoying space do this in the terminal:
+# mv "LLCP2024.XPT " "LLCP2024.XPT"
 
 # Filtering for states ------------------------------------------------------------
 states_to_exclude <- c(8, 9, 12, 17, 21, 23, 26, 29, 31, 32, 36, 39, 40, 41, 42, 48, 51, 53, 56, 66) 
