@@ -1,4 +1,4 @@
-install.packages("here")
+# install.packages("here")
 rm(list = ls())
 
 # Load libraries ----------------------------------------------------------
@@ -12,7 +12,7 @@ library(table1)
 library(here) 
 
 #Open working directory 
-data_dir <- "/Users/anshupoudel/EPI-514-Project"
+data_dir <- "~/EPI-514-Project" #updated to home directory of every user with ~
 
 #Download dataset
 #brfss_21_clean <- read.csv(file.path(data_dir, "brfss_21_clean.csv"))
