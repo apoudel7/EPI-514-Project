@@ -19,7 +19,7 @@ ratio_m <- n_unexposed / n_exposed # ratio of unexposed to exposed need to chang
 p0_range <- c(0.40, 0.43, 0.46, 0.49, 0.52)
 
 # Function to calculate MDPR for each P0
-calculate_mdpr <- function(p0_val) {
+calculate_mdor <- function(p0_val) {
   result <- epi.sscc(
     OR = NA,
     p0 = p0_val,
