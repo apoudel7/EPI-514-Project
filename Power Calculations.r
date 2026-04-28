@@ -1,4 +1,13 @@
+
+#load libraries
 library(epiR)
+library(dplyr)
+library(tidyverse)
+
+#load data
+
+#filter data to select states
+
 
 # Fixed inputs
 total_n <- 350000 # total sample size need to change for our study
@@ -26,3 +35,4 @@ for(p in p0_range) {
   mdor_result <- calculate_mdor(p)
   cat(paste0("If P0 is ", p*100, "%, MDOR is: ", round(mdor_result, 3), "\n"))
 }
+
