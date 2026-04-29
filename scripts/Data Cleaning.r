@@ -18,7 +18,7 @@ library(here)
 #brfss_21_clean <- read.csv(file.path(data_dir, "brfss_21_clean.csv"))
 
 # Open dataset ------------------------------------------------------------
-brfss_24 <- read_xpt(here("LLCP2024.XPT"))
+brfss_24 <- read_xpt(here("LLCP2024.XPT "))
 
 #to remove the annoying space do this in the terminal:
 # mv "LLCP2024.XPT " "LLCP2024.XPT"
@@ -33,5 +33,7 @@ table(study_data$`_STATE`)
 
 # Tooth loss variable count for power calculation ------------------------------------------------------------
 table(study_data$`RMVTETH4`, useNA = "ifany")
+
+#heyyy 
                           
 
