@@ -11,18 +11,8 @@ library(epiR)
 library(table1)
 library(here) 
 
-#Open working directory 
-#data_dir <- "~/EPI-514-Project" #updated to home directory of every user with ~
-
-#Download dataset
-#brfss_21_clean <- read.csv(file.path(data_dir, "brfss_21_clean.csv"))
-
 # Open dataset ------------------------------------------------------------
-<<<<<<< HEAD
-brfss_24 <- read_xpt(here("LLCP2024.XPT "))
-=======
 brfss_24 <- read_xpt(here('LLCP2024.XPT '))
->>>>>>> a3269a55385a6e885fc2952cb7821a9fd55abb2c
 
 #to remove the annoying space do this in the terminal:
 # mv "LLCP2024.XPT " "LLCP2024.XPT"
@@ -38,12 +28,6 @@ table(study_data$`_STATE`)
 # Tooth loss variable count for power calculation ------------------------------------------------------------
 table(study_data$`RMVTETH4`, useNA = "ifany")
 
-<<<<<<< HEAD
-#heyyy 
-                          
-=======
 
 
-
->>>>>>> a3269a55385a6e885fc2952cb7821a9fd55abb2c
 
