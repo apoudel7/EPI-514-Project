@@ -30,6 +30,18 @@ table(brfss24_clean$`_STATE`)
 table(brfss24_clean$`RMVTETH4`, useNA = "ifany")
 
 # Clean food insecurity ------------------------------------------------------------
+  # Check counts and percentages for table 1
+table(brfss24_clean$SDHFOOD1, useNA = "ifany")
+
+x <- brfss24_clean$SDHFOOD1
+food_secure <- sum(x == 5, na.rm = TRUE)
+food_insecure <- sum(x %in% c(1,2,3,4), na.rm = TRUE)
+missing <- sum(x %in% c(7,9) | is.na(x))
+total <- length(x)
+pct_secure <- food_secure / total * 100
+pct_insecure <- food_insecure / total * 100
+pct_missing <- missing / total * 100
+
   # Set new variable to NA 
 brfss24_clean$food_insecurity <- NA
 
@@ -40,12 +52,13 @@ brfss24_clean$food_insecurity[brfss24_clean$SDHFOOD1 == 5] <- 0
   # Remove Missing 
 brfss24_clean <- brfss24_clean[!is.na(brfss24_clean$food_insecurity), ]
 
-# Make a labeled factor
+  # Make a labeled factor
 brfss24_clean <- brfss24_clean %>%
   mutate(food_insec_lab = factor(food_insecurity,
                             levels = c(0,1),
                             labels = c("Food secure",
                                        "Food insecure")))
+
 # Clean Race ------------------------------------------------------------
 brfss24_clean <- brfss24_clean %>%
   mutate(imprace = factor(`_IMPRACE`,
@@ -79,5 +92,3 @@ brfss24_clean <- brfss24_clean %>%
 
 # Smoking category for Table 1 ------------------------------------------------------------
 table1(~ smoker_lab | food_insec_lab, data = brfss24_clean)
-
-
