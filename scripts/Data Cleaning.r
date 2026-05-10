@@ -57,15 +57,32 @@ brfss24_clean <- brfss24_clean %>%
                "Food Secure N(%)")))
 
 # Clean Race ------------------------------------------------------------
+  # Old Race variable
+# brfss24_clean <- brfss24_clean %>%
+#   mutate(imprace = factor(`_IMPRACE`,
+#                      levels = c(1,2,3,4,5,6),
+#                      labels = c("White*",
+#                                 "Black*",
+#                                 "Asian*",
+#                                 "American Indian/Alaskan Native*",
+#                                 "Hispanic",
+#                                 "Another race*")))
+
+  # New Race variable 
 brfss24_clean <- brfss24_clean %>%
-  mutate(imprace = factor(`_IMPRACE`,
-                     levels = c(1,2,3,4,5,6),
-                     labels = c("White*",
-                                "Black*",
-                                "Asian*",
-                                "American Indian/Alaskan Native*",
-                                "Hispanic",
-                                "Another race*")))
+                  mutate(race = factor(`_RACE`,
+                  levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
+                  labels = c(
+                    "White only*",
+                    "Black only*",
+                    "American Indian/Alaska Native only*",
+                    "Asian only*",
+                    "Native Hawaiian/Other Pacific Islander only*",
+                    "Another race only*",
+                    "Multiracial*",
+                    "Hispanic",
+                    "Missing")))
+
 
 # Clean smoking ------------------------------------------------------------
   # Make binary
@@ -149,7 +166,7 @@ brfss24_clean$sex_lab <- factor(brfss24_clean$SEXVAR, levels = c(1,2),
                                 labels = c("Male","Female"))
 
 # Create labels for table 1 ----------------------------------------------------------------
-label(brfss24_clean$imprace)   <- "Race/Ethnicity"
+label(brfss24_clean$race)   <- "Race/Ethnicity"
 label(brfss24_clean$age_cat)      <- "Age (years)"
 label(brfss24_clean$sex_lab)       <- "Sex"
 label(brfss24_clean$smoker_lab)    <- "Smoking"
@@ -182,7 +199,7 @@ my.render.cat <- function(x) {
 
   # Table 1 final
 table1(
-  ~ imprace + age_cat + sex_lab + smoker_lab + income_lab + dent_visit_lab | food_insec_lab,
+  ~ race + age_cat + sex_lab + smoker_lab + income_lab + dent_visit_lab | food_insec_lab,
   data = brfss24_clean,
   overall = "Total N(%)",
   render.continuous = my.render.cont,
@@ -190,7 +207,20 @@ table1(
   caption = "Table 1: Characteristics of BRFSS respondents who completed the Social Determinants module in 2024, total and disaggregated by food security status (N=238783)",
   footnote = c(
   "* Non-Hispanic",
-  "¹ ",
+  "¹ Annual Household Income from all sources. Category groupings informed by Pew Research Center and U.S. Census Bureau data classifications",
   "Footnote: Missing data for the exposure variable (food insecurity) was N = 37243 (15.6%); these respondents were included in the missing category. All data is unweighted."))
   
   
+# Create tooth loss ----------------------------------------------------------------
+brfss24_clean <- brfss24_clean %>%
+  mutate(
+    tooth_loss_lab = case_when(
+      RMVTETH4 %in% c(1,2,3) ~ 1,
+      RMVTETH4 == 8 ~ 0, 
+      RMVTETH4 %in% c(7,9) ~ NA),
+      tooth_loss_lab = factor(
+      tooth_loss_lab,
+      levels = 0:1,
+      labels = c("No Tooth Loss","Tooth Loss")))
+
+# Calculate PRs
