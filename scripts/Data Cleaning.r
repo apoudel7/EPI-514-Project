@@ -26,6 +26,10 @@ table(brfss24_clean$`_STATE`)
 # Tooth loss variable count for power calculation ------------------------------------------------------------
 table(brfss24_clean$`RMVTETH4`, useNA = "ifany")
 
+# Cleaning variable names ------------------------------------------------------------
+names(brfss24_clean)
+names(brfss24_clean) <- sub("^_", "", names(brfss24_clean))
+names(brfss24_clean)
 # Clean food insecurity ------------------------------------------------------------
   # Check counts and percentages for table 1
 table(brfss24_clean$SDHFOOD1, useNA = "ifany")
@@ -38,7 +42,8 @@ total <- length(x)
 pct_secure <- food_secure / total * 100
 pct_insecure <- food_insecure / total * 100
 pct_missing <- missing / total * 100
-  # Set new variable to NA 
+  
+# Set new variable to NA 
 brfss24_clean$food_insecurity <- NA
 
   # Make binary 
@@ -56,7 +61,23 @@ brfss24_clean <- brfss24_clean %>%
     labels = c("Food Insecure N(%)",
                "Food Secure N(%)")))
 
-# Clean Race ------------------------------------------------------------
+# Clean tooth loss ----------------------------------------------------------------
+# Make binary
+brfss24_clean <- brfss24_clean %>%
+  mutate(
+    tooth_loss = case_when(
+      RMVTETH4 %in% c(1,2,3) ~ 1,
+      RMVTETH4 == 8 ~ 0,
+      RMVTETH4 %in% c(7,9) ~ NA_real_))
+
+# Make labeled factor
+brfss24_clean <- brfss24_clean %>%
+  mutate(
+    tooth_loss_lab = factor(
+      tooth_loss,
+      levels = c(0, 1),
+      labels = c("No Tooth Loss", "Tooth Loss")))
+# Clean race ------------------------------------------------------------
   # Old Race variable
 # brfss24_clean <- brfss24_clean %>%
 #   mutate(imprace = factor(`_IMPRACE`,
@@ -70,7 +91,7 @@ brfss24_clean <- brfss24_clean %>%
 
   # New Race variable 
 brfss24_clean <- brfss24_clean %>%
-                  mutate(race = factor(`_RACE`,
+                  mutate(race = factor(RACE,
                   levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9),
                   labels = c(
                     "White only*",
@@ -84,70 +105,6 @@ brfss24_clean <- brfss24_clean %>%
                     "Missing")))
 
 
-# Clean smoking ------------------------------------------------------------
-  # Make binary
-brfss24_clean <- brfss24_clean %>%
-  mutate(
-    smoker = case_when(
-      `_SMOKER3` %in% c(1,2,3) ~ 1,
-      `_SMOKER3` == 4 ~ 0,
-      `_SMOKER3` == 9 ~ NA))
-
-  # Make labeled factor
-brfss24_clean <- brfss24_clean %>%
-  mutate(
-    smoker_lab = case_when(
-      smoker == 1 ~ "Smoker (current or former)",
-      smoker == 0 ~ "Never smoker",
-      is.na(smoker) ~ "Missing"),
-    smoker_lab = factor(smoker_lab, 
-                        levels = c("Smoker (current or former)", "Never smoker")))
-
-# Clean age ------------------------------------------------------------
-brfss24_clean$age_cat <- case_when(
-  brfss24_clean$`_AGEG5YR` %in% c(1,2,3) ~ "18-34", 
-  brfss24_clean$`_AGEG5YR` %in% c(4,5) ~ "35-44", 
-  brfss24_clean$`_AGEG5YR` %in% c(6,7) ~ "45-54",
-  brfss24_clean$`_AGEG5YR` %in% c(8,9) ~ "55-64",
-  brfss24_clean$`_AGEG5YR` %in% c(10,11) ~ "65-74", 
-  brfss24_clean$`_AGEG5YR` %in% c(12,13) ~ "75+",
-  brfss24_clean$`_AGEG5YR` == 14 ~ "Missing", 
-  TRUE ~ "Missing"  
-) %>% 
-  factor(levels = c("18-34", 
-                    "35-44", 
-                    "45-54", 
-                    "55-64", 
-                    "65-74", 
-                    "75+", 
-                    "Missing")) #label 
-
-# Cleaning variable names ------------------------------------------------------------
-names(brfss24_clean)
-names(brfss24_clean) <- sub("^_", "", names(brfss24_clean))
-names(brfss24_clean)
-
-# Clean income --------------------------------------------------------------------
-brfss24_clean <- brfss24_clean %>% 
-  mutate(
-    income_lab = case_when(
-      INCOMG1 == 1 ~ 1, 
-      INCOMG1 %in% c(2, 3, 4) ~ 2, 
-      INCOMG1 == 5 ~ 3, 
-      INCOMG1 == 6 ~ 4, 
-      INCOMG1 == 7 ~ 5,
-      INCOMG1 == 9 ~ NA,
-    ),
-    income_lab = factor(
-      income_lab,
-      levels = 1:5,
-      labels = c(
-        "Below $15,000",
-        "$15,000 - $50,000",
-        "$50,000 - $100,000",
-        "$100,000 - $200,000",
-        "$200,000+")))
-
 # Clean dental visit ----------------------------------------------------------------
 brfss24_clean <- brfss24_clean %>%
   mutate(
@@ -160,12 +117,83 @@ brfss24_clean <- brfss24_clean %>%
       levels = 1:2,
       labels = c("Yes","No")
     ))
+# Clean age ------------------------------------------------------------
+# Make binary
+brfss24_clean <- brfss24_clean %>%
+  mutate(
+    age_binary = case_when(
+      AGE65YR == 1 ~ "18–64",
+      AGE65YR == 2 ~ "65+",
+      AGE65YR == 3 ~ NA_character_)) %>%
+  filter(!is.na(age_binary)) %>%
+  mutate(
+    age_binary = factor(age_binary, levels = c("18–64", "65+")))
+
+# Make labeled factor
+brfss24_clean$age_cat <- case_when(
+  brfss24_clean$AGEG5YR %in% c(1,2,3) ~ "18-34", 
+  brfss24_clean$AGEG5YR %in% c(4,5) ~ "35-44", 
+  brfss24_clean$AGEG5YR %in% c(6,7) ~ "45-54",
+  brfss24_clean$AGEG5YR %in% c(8,9) ~ "55-64",
+  brfss24_clean$AGEG5YR %in% c(10,11) ~ "65-74", 
+  brfss24_clean$AGEG5YR %in% c(12,13) ~ "75+",
+  brfss24_clean$AGEG5YR == 14 ~ "Missing", 
+  TRUE ~ "Missing"  
+) %>% 
+  factor(levels = c("18-34", 
+                    "35-44", 
+                    "45-54", 
+                    "55-64", 
+                    "65-74", 
+                    "75+", 
+                    "Missing")) 
 
 # Clean sex ----------------------------------------------------------------
 brfss24_clean$sex_lab <- factor(brfss24_clean$SEXVAR, levels = c(1,2),
                                 labels = c("Male","Female"))
 
-# Create labels for table 1 ----------------------------------------------------------------
+# Clean smoking ------------------------------------------------------------
+  # Make binary
+brfss24_clean <- brfss24_clean %>%
+  mutate(
+    smoker = case_when(
+      SMOKER3 %in% c(1,2,3) ~ 1,
+      SMOKER3 == 4 ~ 0,
+      SMOKER3 == 9 ~ NA))
+
+  # Make labeled factor
+brfss24_clean <- brfss24_clean %>%
+  mutate(
+    smoker_lab = case_when(
+      smoker == 1 ~ "Smoker (current or former)",
+      smoker == 0 ~ "Never smoker",
+      is.na(smoker) ~ "Missing"),
+    smoker_lab = factor(smoker_lab, 
+                        levels = c("Smoker (current or former)", "Never smoker")))
+
+# Clean income --------------------------------------------------------------------
+brfss24_clean <- brfss24_clean %>% 
+  mutate(
+    income_lab = case_when(
+      INCOMG1 == 1 ~ 1, 
+      INCOMG1 %in% c(2, 3, 4) ~ 2, 
+      INCOMG1 == 5 ~ 3, 
+      INCOMG1 == 6 ~ 4, 
+      INCOMG1 == 7 ~ 5,
+      INCOMG1 == 9 ~ NA_real_
+    ),
+    income_lab = factor(
+      income_lab,
+      levels = 1:5,
+      labels = c(
+        "Below $15,000",
+        "$15,000 - $50,000",
+        "$50,000 - $100,000",
+        "$100,000 - $200,000",
+        "$200,000+")))
+
+# Create Table 1 ----------------------------------------------------------------
+  # Create labels for table 1
 label(brfss24_clean$race)   <- "Race/Ethnicity"
 label(brfss24_clean$age_cat)      <- "Age (years)"
 label(brfss24_clean$sex_lab)       <- "Sex"
@@ -173,7 +201,6 @@ label(brfss24_clean$smoker_lab)    <- "Smoking"
 label(brfss24_clean$income_lab) <- "Income (USD)¹"
 label(brfss24_clean$dent_visit_lab)      <- "Dental Visit (visit in the past year)"
 
-# Create Table 1 ----------------------------------------------------------------
   # To remove % sign from missing 
 brfss24_clean <- brfss24_clean %>%
   mutate(
@@ -211,16 +238,43 @@ table1(
   "Footnote: Missing data for the exposure variable (food insecurity) was N = 37243 (15.6%); these respondents were included in the missing category. All data is unweighted."))
   
   
-# Create tooth loss ----------------------------------------------------------------
-brfss24_clean <- brfss24_clean %>%
-  mutate(
-    tooth_loss_lab = case_when(
-      RMVTETH4 %in% c(1,2,3) ~ 1,
-      RMVTETH4 == 8 ~ 0, 
-      RMVTETH4 %in% c(7,9) ~ NA),
-      tooth_loss_lab = factor(
-      tooth_loss_lab,
-      levels = 0:1,
-      labels = c("No Tooth Loss","Tooth Loss")))
+# Check effect modification ----------------------------------------------------------------
+  # Race/Ethnicity
+tab_race <- xtabs(~ food_insecurity + tooth_loss + race, data = brfss24_clean)   # Create 3-way table
+race_res <- epi.2by2(tab_race, method = "cross.sectional")   # Run MH
+race_res$massoc.detail$PR.strata.wald   # View stratum specific PR
 
-# Calculate PRs
+# Dental Visit (Excluding "Missing" level)
+tab_dent <- xtabs(~ food_insecurity + tooth_loss + dent_visit_lab, 
+                  data = subset(brfss24_clean, dent_visit_lab != "Missing"))
+dent_res <- epi.2by2(tab_dent, method = "cross.sectional")
+dent_res$massoc.detail$PR.strata.wald
+
+  # Dental Visit
+tab_dent <- xtabs(~ food_insecurity + tooth_loss + dent_visit_lab, data = brfss24_clean)   # Create the 3-way table
+dent_res <- epi.2by2(tab_dent, method = "cross.sectional")   # Run MH
+dent_res$massoc.detail$PR.strata.wald   # View stratum specific PR
+
+# Check confounding ----------------------------------------------------------------
+# Age 
+tab_age <- xtabs(~ food_insecurity + tooth_loss + age_binary, 
+                 data = subset(brfss24_clean, !is.na(age_binary)))
+epi.2by2(tab_age, method = "cross.sectional")
+
+# Sex
+tab_sex <- xtabs(~ food_insecurity + tooth_loss + sex_lab, 
+                 data = subset(brfss24_clean, !is.na(sex_lab)))
+epi.2by2(tab_sex, method = "cross.sectional")
+
+# Smoking
+tab_smoke <- xtabs(~ food_insecurity + tooth_loss + smoker_lab, 
+                   data = subset(brfss24_clean, smoker_lab != "Missing") %>% droplevels())
+epi.2by2(tab_smoke, method = "cross.sectional")
+
+
+# Income
+tab_inc <- xtabs(~ food_insecurity + tooth_loss + income_lab, 
+                 data = subset(brfss24_clean, income_lab != "Missing") %>% droplevels())
+epi.2by2(tab_inc, method = "cross.sectional")
+
+
