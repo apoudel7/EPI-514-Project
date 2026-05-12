@@ -236,8 +236,43 @@ table1(
   "* Non-Hispanic",
   "¹ Annual Household Income from all sources. Category groupings informed by Pew Research Center and U.S. Census Bureau data classifications",
   "Footnote: Missing data for the exposure variable (food insecurity) was N = 37243 (15.6%); these respondents were included in the missing category. All data is unweighted."))
-  
-  
+
+# Create Table 2A ----------------------------------------------------------------
+# Tooth loos prevalence % for exposed vs. unexposed 
+table2a <- brfss24_clean %>%
+  group_by(food_insec_lab) %>%
+  summarise(
+    n = n(),
+    tooth_loss_prev = paste0(round(mean(tooth_loss_lab == "Tooth Loss", na.rm = TRUE) * 100, 1), "%"),
+    .groups = "drop")
+table2a
+
+# Tooth loss prevalence % for tooth loss by race/ethnicity and exposure status 
+table2a_1 <- brfss24_clean %>%
+  filter(
+    !is.na(race) & race != "Missing",
+    !is.na(food_insec_lab),
+    !is.na(tooth_loss_lab)) %>%
+  group_by(race, food_insec_lab) %>%
+  summarise(
+    n = n(),
+    tooth_loss_prev = mean(tooth_loss_lab == "Tooth Loss") * 100,
+    .groups = "drop")
+table2a_1
+
+# Tooth loss prevalence % by dental visit and exposure status
+table2a_2 <- brfss24_clean %>%
+  filter(
+    !is.na(dent_visit_lab),
+    !is.na(food_insec_lab),
+    !is.na(tooth_loss_lab)) %>%
+  group_by(dent_visit_lab, food_insec_lab) %>%
+  summarise(
+    n = n(),
+    tooth_loss_prev = mean(tooth_loss_lab == "Tooth Loss") * 100,
+    .groups = "drop")
+table2a_2 
+
 # Check effect modification ----------------------------------------------------------------
   # Race/Ethnicity
 tab_race <- xtabs(~ food_insecurity + tooth_loss + race, data = brfss24_clean)   # Create 3-way table
@@ -276,5 +311,3 @@ epi.2by2(tab_smoke, method = "cross.sectional")
 tab_inc <- xtabs(~ food_insecurity + tooth_loss + income_lab, 
                  data = subset(brfss24_clean, income_lab != "Missing") %>% droplevels())
 epi.2by2(tab_inc, method = "cross.sectional")
-
-
